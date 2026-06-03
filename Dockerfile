@@ -15,7 +15,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 WORKDIR /app
 
 # Copier le Caddyfile
-COPY Caddyfile /etc/caddy/Caddyfile
+COPY Caddyfile.txt /etc/caddy/Caddyfile
 
 # Copier les fichiers composer
 COPY composer.json composer.lock ./
