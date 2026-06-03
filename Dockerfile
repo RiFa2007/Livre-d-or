@@ -9,8 +9,12 @@ RUN apt-get update && apt-get install -y \
     zip \
     && rm -rf /var/lib/apt/lists/*
 
+# Installer l'extension PDO PostgreSQL
+RUN install-php-extensions pdo_pgsql
+
 # Autoriser Composer en root
 ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV APP_ENV=prod
 
 WORKDIR /app
 
@@ -26,15 +30,11 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 # Copier tout le projet
 COPY . .
 
-ENV APP_ENV=prod
-
 # Permissions
 RUN mkdir -p var/cache var/log && chmod -R 777 var/
 
 # Compiler les assets et vider le cache
 RUN composer dump-autoload --optimize && \
     php bin/console cache:warmup --env=prod || true
-
-ENV SERVER_NAME=":8000"
 
 EXPOSE 8000
