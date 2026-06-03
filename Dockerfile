@@ -2,6 +2,9 @@ FROM dunglas/frankenphp:latest
 
 WORKDIR /app
 
+# Copier le Caddyfile en premier
+COPY Caddyfile.txt /etc/caddy/Caddyfile
+
 # Copier les fichiers composer
 COPY composer.json composer.lock ./
 
@@ -19,6 +22,3 @@ RUN composer dump-autoload --optimize && \
     php bin/console cache:warmup --env=prod || true
 
 EXPOSE 8000
-
-# Caddyfile
-COPY Caddyfile /etc/caddy/Caddyfile
