@@ -4,6 +4,9 @@ set -e
 # Installer les assets JS
 php bin/console importmap:install
 
+# Installer les assets des bundles (EasyAdmin etc.)
+php bin/console assets:install --env=prod
+
 # Lancer les migrations
 php bin/console doctrine:migrations:migrate --no-interaction --env=prod
 
