@@ -33,7 +33,6 @@ RUN mkdir -p var/cache var/log && chmod -R 777 var/
 RUN composer dump-autoload --optimize && \
     php bin/console cache:warmup --env=prod || true
 
-ENV FRANKENPHP_CONFIG="worker ./public/index.php"
 ENV SERVER_NAME=":8000"
 
 EXPOSE 8000
