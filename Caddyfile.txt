@@ -7,4 +7,5 @@
 http://:{$PORT} {
     root * /app/public
     php_server
+    env APP_ENV prod
 }

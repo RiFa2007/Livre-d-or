@@ -26,6 +26,8 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 # Copier tout le projet
 COPY . .
 
+ENV APP_ENV=prod
+
 # Permissions
 RUN mkdir -p var/cache var/log && chmod -R 777 var/
 
