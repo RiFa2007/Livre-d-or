@@ -1,5 +1,8 @@
 FROM dunglas/frankenphp:latest
 
+# Copier Composer depuis l'image officielle
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 WORKDIR /app
 
 # Copier le Caddyfile en premier
