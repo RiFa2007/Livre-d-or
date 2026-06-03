@@ -14,7 +14,7 @@ ENV APP_ENV=prod
 
 WORKDIR /app
 
-COPY Caddyfile.txt /etc/caddy/Caddyfile
+COPY Caddyfile.txt /etc/frankenphp/Caddyfile
 COPY composer.json composer.lock ./
 
 RUN composer install --no-dev --optimize-autoloader --no-scripts
