@@ -35,6 +35,7 @@ class Conference
         $this->comments = new ArrayCollection();
     }
 
+    // Permet d'afficher une entité de String
     public function __toString():string
     {
         return $this->city.' '.$this->year;
