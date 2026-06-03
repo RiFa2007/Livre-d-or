@@ -3,10 +3,19 @@ FROM dunglas/frankenphp:latest
 # Copier Composer depuis l'image officielle
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Installer les extensions manquantes
+RUN apt-get update && apt-get install -y \
+    unzip \
+    zip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Autoriser Composer en root
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
 WORKDIR /app
 
-# Copier le Caddyfile en premier
-COPY Caddyfile.txt /etc/caddy/Caddyfile
+# Copier le Caddyfile
+COPY Caddyfile /etc/caddy/Caddyfile
 
 # Copier les fichiers composer
 COPY composer.json composer.lock ./
