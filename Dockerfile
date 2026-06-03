@@ -26,4 +26,13 @@ RUN mkdir -p var/cache var/log && chmod -R 777 var/
 RUN composer dump-autoload --optimize && \
     php bin/console cache:warmup --env=prod || true
 
-EXPOSE 80
+RUN composer dump-autoload --optimize && \
+    php bin/console cache:warmup --env=prod || true
+
+# Script de démarrage
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+EXPOSE 8000
+
+ENTRYPOINT ["docker-entrypoint.sh"]
