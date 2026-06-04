@@ -24,7 +24,7 @@ class SpamChecker
     {
         $response = $this->client->request('POST', $this->endpoint, [
             'body' => array_merge($context, [
-                'blog' => 'livre-d-or-sessions-in-db.up.railway.app',
+                'blog' => 'https://livre-d-or-production-14e7.up.railway.app/',
                 'comment_type' => 'comment',
                 'comment_author' => $comment->getAuthor(),
                 'comment_author_email' => $comment->getEmail(),
