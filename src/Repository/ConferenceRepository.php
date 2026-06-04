@@ -17,7 +17,7 @@ class ConferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, Conference::class);
     }
 
-    // Ranger les resultat en ordre alphabetique croissant
+    // Ranger les resultat en ordre alphabetique par city et croissant par année
     #[Override]
     public function findAll():array
     {
