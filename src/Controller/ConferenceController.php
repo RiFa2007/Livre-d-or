@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Twig\Environment;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-
+use App\SpamChecker;
 
 final class ConferenceController extends AbstractController
 {
@@ -33,6 +33,7 @@ final class ConferenceController extends AbstractController
       Request $request,
       Conference $conference,
       CommentRepository $commentRepository,
+      SpamChecker $spamChecker,
       #[Autowire('%photo_dir%')] string $photoDir,
    ): Response {
       $comment = new Comment();
@@ -48,6 +49,16 @@ final class ConferenceController extends AbstractController
             $comment->setPhotoFilename($filename);
          }
          $this->em->persist($comment);
+
+         $context = [
+            'user_ip' => $request->getClientIp(),
+            'user_agent' => $request->headers->get('user-agent'),
+            'referrer' => $request->headers->get('referer'),
+            'permalink' => $request->getUri(),
+         ];
+         if (2 === $spamChecker->getSpamScore($comment, $context)) {
+            throw new \RuntimeException('Blatant spam, go away!');
+         }
          $this->em->flush();
 
          return $this->redirectToRoute('conference', ['slug' => $conference->getSlug()]);
