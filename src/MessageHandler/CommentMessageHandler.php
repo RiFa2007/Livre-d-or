@@ -47,7 +47,7 @@ class CommentMessageHandler
             // envoie un mail   
             $this->mailer->send((new NotificationEmail())
                 ->subject('New comment posted')
-                ->htmlTemplate('emails/comment_notification.html.twig')
+                ->htmlTemplate('email/comment_notification.html.twig')
                 ->from($this->adminEmail)
                 ->to($this->adminEmail)
                 ->context(['comment' => $comment])
