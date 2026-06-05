@@ -28,6 +28,15 @@ final class ConferenceController extends AbstractController
    {
       return $this->render("conference\index.html.twig", [
          'conferences' => $conferenceRepository->findAll()
+      ])->setSharedMaxAge(3600);// met la page en cache pendant une heure (permet de limiter le nombre de requete)
+      
+   }
+
+   #[Route('/conference_header', name: 'conference_header')]
+   public function conferenceHeader(ConferenceRepository $conferenceRepository): Response
+   {
+      return $this->render('conference/header.html.twig', [
+         'conferences' => $conferenceRepository->findAll(),
       ]);
    }
 
@@ -45,12 +54,13 @@ final class ConferenceController extends AbstractController
       if ($form->isSubmitted() && $form->isValid()) {
          $comment->setConference($conference);
          if ($photo = $form['photo']->getData()) {
-            $filename = bin2hex(random_bytes(6)) . '.' . $photo->guessExtension();
-            $photo->move($photoDir, $filename);
+            $filename = bin2hex(random_bytes(6)) . '.' . $photo->guessExtension(); // cree un nom aleatoire et le donne au fichier
+            $photo->move($photoDir, $filename); // deplace
             $comment->setPhotoFilename($filename);
          }
          $this->em->persist($comment);
          $this->em->flush();
+         // contexte necessaire pour l'API de verification de spam
          $context = [
             'user_ip' => $request->getClientIp(),
             'user_agent' => $request->headers->get('user-agent'),
