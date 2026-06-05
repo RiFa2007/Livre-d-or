@@ -10,10 +10,12 @@ framework:
             supports:
                 - App\Entity\Comment
             initial_marking: submitted
+            #les etats dans les quel un commentaire peut eter
             places:
                 - submitted
-                - ham
+                - ham #inverse de spam
                 - potential_spam
+                - ready # passe toujours par cet etat avant d'etre publié
                 - spam
                 - rejected
                 - published
@@ -29,13 +31,16 @@ framework:
                     to:   spam
                 publish:
                     from: potential_spam
-                    to:   published
+                    to:   ready
                 reject:
                     from: potential_spam
                     to:   rejected
                 publish_ham:
                     from: ham
-                    to:   published
+                    to:   ready
                 reject_ham:
                     from: ham
                     to:   rejected
+                optimize: # optimisation des images
+                    from: ready
+                    to:   published

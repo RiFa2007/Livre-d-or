@@ -4,6 +4,7 @@ namespace App\MessageHandler;
 
 use App\Message\CommentMessage;
 use App\Repository\CommentRepository;
+use App\ImageOptimizer;
 use App\SpamChecker;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -13,6 +14,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Bridge\Twig\Mime\NotificationEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
+
 #[AsMessageHandler]
 class CommentMessageHandler
 {
@@ -23,6 +25,8 @@ class CommentMessageHandler
         private MessageBusInterface $bus,
         private WorkflowInterface $commentStateMachine,
         private MailerInterface $mailer,
+        private ImageOptimizer $imageOptimizer,
+        #[Autowire('%photo_dir%')] private string $photoDir,
         #[Autowire('%admin_email%')] private string $adminEmail,
         private ?LoggerInterface $logger = null,
     ) {}
@@ -46,12 +50,18 @@ class CommentMessageHandler
         } elseif ($this->commentStateMachine->can($comment, 'publish') || $this->commentStateMachine->can($comment, 'publish_ham')) {
             // envoie un mail   
             $this->mailer->send((new NotificationEmail())
-                ->subject('New comment posted')
-                ->htmlTemplate('email/comment_notification.html.twig')
-                ->from($this->adminEmail)
-                ->to($this->adminEmail)
-                ->context(['comment' => $comment])
+                    ->subject('New comment posted')
+                    ->htmlTemplate('email/comment_notification.html.twig')
+                    ->from($this->adminEmail)
+                    ->to($this->adminEmail)
+                    ->context(['comment' => $comment])
             );
+        } elseif ($this->commentStateMachine->can($comment, 'optimize')) {
+            if ($comment->getPhotoFilename()) {
+                $this->imageOptimizer->resize($this->photoDir . '/' . $comment->getPhotoFilename());
+            }
+            $this->commentStateMachine->apply($comment, 'optimize');
+            $this->entityManager->flush();
         } elseif ($this->logger) {
             $this->logger->debug('Dropping comment message', ['comment' => $comment->getId(), 'state' => $comment->getState()]);
         }
