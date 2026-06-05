@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controller;
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 use App\Entity\Comment;
 use App\Entity\Conference;
 use App\Form\CommentType;
@@ -15,6 +15,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use App\Message\CommentMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\NotifierInterface;
 
 final class ConferenceController extends AbstractController
 {
@@ -28,8 +30,8 @@ final class ConferenceController extends AbstractController
    {
       return $this->render("conference\index.html.twig", [
          'conferences' => $conferenceRepository->findAll()
-      ])->setSharedMaxAge(3600);// met la page en cache pendant une heure (permet de limiter le nombre de requete)
-      
+      ])->setSharedMaxAge(3600); // met la page en cache pendant une heure (permet de limiter le nombre de requete)
+
    }
 
    #[Route('/conference_header', name: 'conference_header')]
@@ -40,11 +42,13 @@ final class ConferenceController extends AbstractController
       ])->setSharedMaxAge(3600);
    }
 
+
    #[Route('/conference/{slug}', name: 'conference', methods: ['GET', 'POST'])]
    public function show(
       Request $request,
       Conference $conference,
       CommentRepository $commentRepository,
+      NotifierInterface $notifier,
       #[Autowire('%photo_dir%')] string $photoDir,
    ): Response {
       $comment = new Comment();
@@ -69,7 +73,11 @@ final class ConferenceController extends AbstractController
          ];
 
          $this->bus->dispatch(new CommentMessage($comment->getId(), $context));
+         $notifier->send(new Notification('Thank you for the feedback; your comment will be posted after moderation.', ['browser']));
          return $this->redirectToRoute('conference', ['slug' => $conference->getSlug()]);
+      }
+      if ($form->isSubmitted()) {
+         $notifier->send(new Notification('Can you check your submission? There are some problems with it.', ['browser']));
       }
 
       $offset = max(0, $request->query->getInt('offset', 0));

@@ -14,7 +14,8 @@ use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Bridge\Twig\Mime\NotificationEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
-
+use Symfony\Component\Notifier\NotifierInterface;
+use App\Notification\CommentReviewNotification;
 #[AsMessageHandler]
 class CommentMessageHandler
 {
@@ -24,10 +25,9 @@ class CommentMessageHandler
         private CommentRepository $commentRepository,
         private MessageBusInterface $bus,
         private WorkflowInterface $commentStateMachine,
-        private MailerInterface $mailer,
         private ImageOptimizer $imageOptimizer,
+        private NotifierInterface $notifier,
         #[Autowire('%photo_dir%')] private string $photoDir,
-        #[Autowire('%admin_email%')] private string $adminEmail,
         private ?LoggerInterface $logger = null,
     ) {}
 
@@ -48,14 +48,8 @@ class CommentMessageHandler
             $this->entityManager->flush();
             $this->bus->dispatch($message);
         } elseif ($this->commentStateMachine->can($comment, 'publish') || $this->commentStateMachine->can($comment, 'publish_ham')) {
-            // envoie un mail   
-            $this->mailer->send((new NotificationEmail())
-                    ->subject('New comment posted')
-                    ->htmlTemplate('email/comment_notification.html.twig')
-                    ->from($this->adminEmail)
-                    ->to($this->adminEmail)
-                    ->context(['comment' => $comment])
-            );
+            // envoie un mail
+            $this->notifier->send(new CommentReviewNotification($comment));
         } elseif ($this->commentStateMachine->can($comment, 'optimize')) {
             if ($comment->getPhotoFilename()) {
                 $this->imageOptimizer->resize($this->photoDir . '/' . $comment->getPhotoFilename());
