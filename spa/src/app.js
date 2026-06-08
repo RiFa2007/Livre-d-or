@@ -31,9 +31,9 @@ function App() {
 
                     <nav className="bg-light border-bottom text-center">
                         {conferences.map((conference)=>(
-                            <link className='nav-conference' href={'/conference/'+conference.slug}>
+                            <Link className='nav-conference' href={'/conference/'+conference.slug}>
                                 {conference.city} {conference.year}
-                            </link>
+                            </Link>
                         ))}
                     </nav>
                 </header>

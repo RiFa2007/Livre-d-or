@@ -17,8 +17,8 @@ function Comment({comments}) {
                 <div className="shadow border rounded-3 p-3 mb-4">
                     <div className="comment-img mr-3">
                         {!comment.photoFilename ? '' : (
-                            <a href={ENV_API_ENDPOINT+'uploads/photos/'+comment.photoFilename} target="_blank">
-                                <img src={ENV_API_ENDPOINT+'uploads/photos/'+comment.photoFilename} />
+                            <a href={ENV_API_ENDPOINT+'/uploads/photos/'+comment.photoFilename} target="_blank">
+                                <img src={ENV_API_ENDPOINT+'/uploads/photos/'+comment.photoFilename} />
                             </a>
                         )}
                     </div>
@@ -30,6 +30,7 @@ function Comment({comments}) {
         </div>
      );
     }
+
 export default function Conference({conferences, slug}) {
     const conference = conferences.find(conference => conference.slug === slug);
     const [comments, setComments] = useState([]);
