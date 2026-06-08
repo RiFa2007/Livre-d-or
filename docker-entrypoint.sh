@@ -1,9 +1,6 @@
 #!/bin/sh
 set -e
 
-# Installer les assets JS
-php bin/console importmap:install
-
 # Installer les assets des bundles (EasyAdmin etc.)
 php bin/console assets:install --env=prod
 
