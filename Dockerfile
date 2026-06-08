@@ -6,8 +6,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     zip \
     libpq-dev \
+    libxslt1-dev \
     && rm -rf /var/lib/apt/lists/* \
-    && docker-php-ext-install pdo pdo_pgsql
+    && docker-php-ext-install pdo pdo_pgsql xsl
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV APP_ENV=prod
